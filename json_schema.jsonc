@@ -1,0 +1,12 @@
+{
+    /*title of the schema*/
+    "title": "student", /*title of the schema*/
+     
+    "description": "schema about students", /* description of the schema*/
+    "type": "object", /* data- type of the schema*/
+    "properties":{
+        "name":"string", /* name of the student*/
+        "age":"integer" /* age of the student*/
+    },
+    "required":["name"] // must have fields
+}

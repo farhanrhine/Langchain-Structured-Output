@@ -1,11 +1,11 @@
-from langchain_openai import ChatOpenAI
+# THIS CODE CAN GIVE SUMMARY OF ANY PRODUCT REVIEW IN A STRUCTURED FORMAT using json schema.
+
+from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
-from typing import TypedDict, Annotated, Optional, Literal
-from pydantic import BaseModel, Field
 
 load_dotenv()
 
-model = ChatOpenAI()
+model = ChatOllama(model="tinydolphin")
 
 # schema
 json_schema = {
@@ -33,18 +33,18 @@ json_schema = {
       "items": {
         "type": "string"
       },
-      "description": "Write down all the pros inside a list"
+      "description": "Extract a list of pros mentioned in the review. Look for sections that start with 'Pros:' or list positive aspects with bullet points"
     },
     "cons": {
       "type": ["array", "null"],
       "items": {
         "type": "string"
       },
-      "description": "Write down all the cons inside a list"
+      "description": "Extract a list of cons mentioned in the review. Look for sections that start with 'Cons:' or list negative aspects with bullet points"
     },
     "name": {
       "type": ["string", "null"],
-      "description": "Write the name of the reviewer"
+      "description": "Extract the name of the reviewer if mentioned, typically found at the end of the review after 'Review by' or similar phrases"
     }
   },
   "required": ["key_themes", "summary", "sentiment"]
@@ -53,19 +53,34 @@ json_schema = {
 
 structured_model = model.with_structured_output(json_schema)
 
-result = structured_model.invoke("""I recently upgraded to the Samsung Galaxy S24 Ultra, and I must say, it’s an absolute powerhouse! The Snapdragon 8 Gen 3 processor makes everything lightning fast—whether I’m gaming, multitasking, or editing photos. The 5000mAh battery easily lasts a full day even with heavy use, and the 45W fast charging is a lifesaver.
+result = structured_model.invoke("""I recently upgraded to the Samsung Galaxy S24 Ultra, and I must say, it's an absolute powerhouse! The Snapdragon 8 Gen 3 processor makes everything lightning fast—whether I'm gaming, multitasking, or editing photos. The 5000mAh battery easily lasts a full day even with heavy use, and the 45W fast charging is a lifesaver.
 
 The S-Pen integration is a great touch for note-taking and quick sketches, though I don't use it often. What really blew me away is the 200MP camera—the night mode is stunning, capturing crisp, vibrant images even in low light. Zooming up to 100x actually works well for distant objects, but anything beyond 30x loses quality.
 
-However, the weight and size make it a bit uncomfortable for one-handed use. Also, Samsung’s One UI still comes with bloatware—why do I need five different Samsung apps for things Google already provides? The $1,300 price tag is also a hard pill to swallow.
+However, the weight and size make it a bit uncomfortable for one-handed use. Also, Samsung's One UI still comes with bloatware—why do I need five different Samsung apps for things Google already provides? The $1,300 price tag is also a hard pill to swallow.
 
-Pros:
-Insanely powerful processor (great for gaming and productivity)
-Stunning 200MP camera with incredible zoom capabilities
-Long battery life with fast charging
-S-Pen support is unique and useful
-                                 
-Review by Nitish Singh
-""")
+---
 
-print(result)
+PROS:
+- Insanely powerful processor (great for gaming and productivity)
+- Stunning 200MP camera with incredible zoom capabilities
+- Long battery life with fast charging
+- S-Pen support is unique and useful
+
+CONS:
+- Heavy and large, making one-handed use difficult
+- Comes with bloatware (duplicate Samsung apps)
+- Very expensive at $1,300
+
+Review by: Farhan""")
+
+#print(result)
+print("Structured Output:")
+print("=" * 60)
+print(f"\nKey Themes: {result['key_themes']}")
+print(f"\nSummary: {result['summary']}")
+print(f"\nSentiment: {result['sentiment']}")
+print(f"\nPros: {result.get('pros')}")
+print(f"\nCons: {result.get('cons')}")
+print(f"\nname: {result.get('name')}")
+print("=" * 60)
