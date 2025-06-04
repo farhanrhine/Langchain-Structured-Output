@@ -1,17 +1,20 @@
-from langchain_openai import ChatOpenAI
+# THIS CODE CAN GIVE SUMMARY OF ANY PRODUCT REVIEW IN A STRUCTURED FORMAT
+
+from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
 from typing import TypedDict, Annotated, Optional, Literal
 
 load_dotenv()
 
-model = ChatOpenAI()
+model = ChatOllama(model="tinydolphin")
 
 # schema
 class Review(TypedDict):
 
     key_themes: Annotated[list[str], "Write down all the key themes discussed in the review in a list"]
+    title: Annotated[str, "Write down the title of the review product"]
     summary: Annotated[str, "A brief summary of the review"]
-    sentiment: Annotated[Literal["pos", "neg"], "Return sentiment of the review either negative, positive or neutral"]
+    sentiment: Annotated[Literal["positive", "negative", "neutral"], "Return sentiment of the review either negative, positive or neutral"]
     pros: Annotated[Optional[list[str]], "Write down all the pros inside a list"]
     cons: Annotated[Optional[list[str]], "Write down all the cons inside a list"]
     name: Annotated[Optional[str], "Write the name of the reviewer"]
@@ -31,7 +34,17 @@ Stunning 200MP camera with incredible zoom capabilities
 Long battery life with fast charging
 S-Pen support is unique and useful
                                  
-Review by Nitish Singh
+Review by Farhan
 """)
 
-print(result['name'])
+# print(result)
+print("Structured Output:")
+print("=" * 60)
+print(f"\nTitle: {result['title']}")
+print(f"\nKey Themes: {result['key_themes']}")
+print(f"\nSummary: {result['summary']}")
+print(f"\nSentiment: {result['sentiment']}")
+print(f"\nPros: {result['pros']}")
+print(f"\nCons: {result['cons']}")
+print(f"\nname: {result['name']}")
+print("=" * 60)
